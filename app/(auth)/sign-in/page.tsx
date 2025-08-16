@@ -1,22 +1,35 @@
 "use client"
 import { Button } from '@/components/ui/button'
+import { AuthContext } from '@/context/AuthContext';
+import { api } from '@/convex/_generated/api';
+import { GetAuthUserData } from '@/services/GlobalApi';
 import { useGoogleLogin } from '@react-oauth/google';
 import axios from 'axios';
+import { useMutation } from 'convex/react';
 import Image from 'next/image'
-import React from 'react'
+import React, { useContext } from 'react'
 
 function SignIn() {
 
-  
+const CreateUser=useMutation(api.users.CreateUser);
+const { user, setUser} = useContext(AuthContext);
 const googleLogin = useGoogleLogin({
   onSuccess: async (tokenResponse) => {
-    console.log(tokenResponse);
-    const userInfo = await axios.get(
-      'https://www.googleapis.com/oauth2/v3/userinfo',
-      { headers: { Authorization: 'Bearer' + tokenResponse.access_token } },
-    );
+    if(typeof window!== undefined){
+      localStorage.setItem('user-token', tokenResponse.access_token);
+    }
 
-    console.log(userInfo);
+    const user =await GetAuthUserData(tokenResponse.access_token);
+    
+    console.log(user);
+
+    //save user info
+    const result= await CreateUser({
+      name:user?.name,
+      email:user?.email,
+      picture:user.picture
+    });
+    setUser(result)
   },
   onError: errorResponse => console.log(errorResponse),
 });
