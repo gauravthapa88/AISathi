@@ -7,16 +7,18 @@ import { useGoogleLogin } from '@react-oauth/google';
 import axios from 'axios';
 import { useMutation } from 'convex/react';
 import Image from 'next/image'
+import { useRouter } from 'next/navigation';
 import React, { useContext } from 'react'
 
 function SignIn() {
 
-const CreateUser=useMutation(api.users.CreateUser);
+const CreateUser = useMutation(api.users.CreateUser);
 const { user, setUser} = useContext(AuthContext);
+const router=useRouter();
 const googleLogin = useGoogleLogin({
   onSuccess: async (tokenResponse) => {
-    if(typeof window!== undefined){
-      localStorage.setItem('user-token', tokenResponse.access_token);
+    if(typeof window !== undefined){
+      localStorage.setItem('user_token', tokenResponse.access_token);
     }
 
     const user =await GetAuthUserData(tokenResponse.access_token);
@@ -30,6 +32,7 @@ const googleLogin = useGoogleLogin({
       picture:user.picture
     });
     setUser(result)
+    router.replace('/AIassistants')
   },
   onError: errorResponse => console.log(errorResponse),
 });

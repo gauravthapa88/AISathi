@@ -26,7 +26,7 @@ function Provider({
                     </div>
                 </NextThemesProvider>
             </AuthContext.Provider> 
-        </ConvexProvider>;
+        </ConvexProvider>
     </GoogleOAuthProvider>
   )
 }
